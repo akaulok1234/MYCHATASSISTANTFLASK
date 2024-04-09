@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Aka's Chat Assistant</title>
+    <style>
+        body {
+            background-color: #ADD8E6; /* Light blue background color */
+            font-family: Arial, sans-serif;
+            text-align: center; /* Center align text */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #chatbox {
+            width: 70%; /* Increased width for chat box */
+            margin: 20px auto; /* Center align chat box */
+            background-color: #fff; /* White background color for chat box */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow effect */
+            overflow-y: scroll; /* Add vertical scrollbar */
+            max-height: calc(100vh - 200px); /* Limit height of chat box and add scrollbar if content exceeds */
+        }
+
+        #messages {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #messages li {
+            margin-bottom: 20px; /* Add bottom margin for spacing */
+        }
+
+        #messages li:nth-child(odd) {
+            background-color: #f5f5f5; /* Alternate background color for messages */
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        #user-message {
+            font-size: 18px; /* Larger font size for user messages */
+        }
+
+        #assistant-message {
+            font-size: 18px; /* Larger font size for assistant messages */
+            font-style: italic; /* Italicize assistant messages */
+        }
+
+        #chat-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px; /* Add space between chat box and form */
+        }
+
+        #user-input {
+            margin-right: 10px; /* Add right margin to the input field */
+        }
+
+        button[type="submit"] {
+            margin-left: 10px; /* Add left margin to the send button */
+        }
+    </style>
+</head>
+<body>
+    <h1>Aka's Chat Assistant</h1>
+    <div id="chatbox">
+        <ul id="messages"></ul>
+    </div>
+    <form id="chat-form">
+        <input type="text" id="user-input" autocomplete="off" placeholder="Type your message...">
+        <button type="submit">Send</button>
+    </form>
+
+    <script>
+        const messages = document.getElementById('messages');
+        const chatForm = document.getElementById('chat-form');
+        const userInput = document.getElementById('user-input');
+
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const userMessage = userInput.value;
+            userInput.value = '';
+
+            const userMessageItem = document.createElement('li');
+            userMessageItem.id = 'user-message'; // Set id for user messages
+            userMessageItem.innerText = 'User: ' + userMessage;
+            messages.appendChild(userMessageItem);
+
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'message=' + encodeURIComponent(userMessage)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const assistantResponse = data.response;
+                const assistantMessageItem = document.createElement('li');
+                assistantMessageItem.id = 'assistant-message'; // Set id for assistant messages
+                assistantMessageItem.innerText = 'Assistant: ' + assistantResponse;
+                messages.appendChild(assistantMessageItem);
+            });
+        });
+    </script>
+</body>
+</html>
